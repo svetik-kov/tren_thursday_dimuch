@@ -1,4 +1,4 @@
-import {setTasksAC, tasksReducer} from './tasks-reducer';
+import {addTaskAC, setTasksAC, tasksReducer} from './tasks-reducer';
 import {TasksStateType} from '../App';
 import {TaskPriorities, TaskStatuses} from '../api/todolists-api';
 
@@ -45,4 +45,30 @@ test('empty be added when we set tasks', () => {
     expect(endState['todolistId2'].length).toBe(3)
 
 
+})
+
+test('correct task should be added to correct array', () => {
+
+
+    //const action = addTaskAC('juce', 'todolistId2')
+    const action = addTaskAC({
+        title:'juce',
+        todoListId:'todolistId2',
+        status: TaskStatuses.New,
+        id:'id exist',
+        order:0,
+        addedDate:'',
+        priority: TaskPriorities.Low,
+        startDate:'',
+        deadline:'',
+        description:''
+    })
+
+    const endState = tasksReducer(startState, action)
+
+    expect(endState['todolistId1'].length).toBe(2)
+    expect(endState['todolistId2'].length).toBe(4)
+    expect(endState['todolistId2'][0].id).toBeDefined()
+    expect(endState['todolistId2'][0].title).toBe('juce')
+    expect(endState['todolistId2'][0].status).toBe(TaskStatuses.New)
 })
