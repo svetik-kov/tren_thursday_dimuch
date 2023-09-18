@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect} from 'react'
 import './App.css';
-import {  Todolist } from './Todolist';
-import { AddItemForm } from './AddItemForm';
+import {Todolist} from '../features/TodolistsList/Todolist/Todolist';
+import {AddItemForm} from '../components/AddItemForm/AddItemForm';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -10,20 +10,21 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import { Menu } from '@mui/icons-material';
+import {Menu} from '@mui/icons-material';
 import {
     addTodolistTC,
     changeTodolistFilterAC,
-     changeTodolistTitleTC, fetchTodolistTC,  FilterValuesType,
-    removeTodolistTC,  TodolistDomainType
-} from './state/todolists-reducer';
+    changeTodolistTitleTC, fetchTodolistTC, FilterValuesType,
+    removeTodolistTC, TodolistDomainType
+} from '../features/TodolistsList/todolists-reducer';
 import {
     addTasksTC,
     removeTasksTC, updateTaskTC
-} from './state/tasks-reducer';
-import { useDispatch, useSelector } from 'react-redux';
-import {AppRootStateType, useAppDispatch} from './state/store';
-import {TaskStatuses, TaskType, todolistsApi, TodolistType} from './api/todolists-api';
+} from '../features/TodolistsList/tasks-reducer';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppRootStateType, useAppDispatch} from './store';
+import {TaskStatuses, TaskType, todolistsApi, TodolistType} from '../api/todolists-api';
+import {TodolistsList} from '../features/TodolistsList/TodolistsList';
 
 
 export type TasksStateType = {
@@ -33,17 +34,17 @@ export type TasksStateType = {
 
 function App() {
 
-    const todolists = useSelector<AppRootStateType, Array<TodolistDomainType>>(state => state.todolists)
+    /*const todolists = useSelector<AppRootStateType, Array<TodolistDomainType>>(state => state.todolists)
     const tasks = useSelector<AppRootStateType, TasksStateType>(state => state.tasks)
     const dispatch = useAppDispatch();
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(fetchTodolistTC())
 
-    },[])
+    }, [])
 
     const removeTask = useCallback(function (id: string, todolistId: string) {
-        dispatch(removeTasksTC(id,todolistId))
+        dispatch(removeTasksTC(id, todolistId))
 
     }, []);
 
@@ -52,13 +53,13 @@ function App() {
         dispatch(action);
     }, []);
 
-    const changeStatus = useCallback(function (id: string, status:TaskStatuses, todolistId: string) {
-        const action = updateTaskTC(id,{status},todolistId);
+    const changeStatus = useCallback(function (id: string, status: TaskStatuses, todolistId: string) {
+        const action = updateTaskTC(id, {status}, todolistId);
         dispatch(action);
     }, []);
 
     const changeTaskTitle = useCallback(function (id: string, newTitle: string, todolistId: string) {
-        const action = updateTaskTC(id, {title:newTitle}, todolistId);
+        const action = updateTaskTC(id, {title: newTitle}, todolistId);
         dispatch(action);
     }, []);
 
@@ -79,9 +80,9 @@ function App() {
 
     const addTodolist = useCallback((title: string) => {
         dispatch(addTodolistTC(title))
-        /*const action = addTodolistAC(title);
-        dispatch(action)*/;
-    }, [dispatch]);
+        /!*const action = addTodolistAC(title);
+        dispatch(action)*!/;
+    }, [dispatch]);*/
 
     return (
         <div className="App">
@@ -97,12 +98,14 @@ function App() {
                 </Toolbar>
             </AppBar>
             <Container fixed>
-                <Grid container style={{padding: '20px'}}>
+                <TodolistsList />
+                {/*     <Grid container style={{padding: '20px'}}>
                     <AddItemForm addItem={addTodolist}/>
                 </Grid>
                 <Grid container spacing={3}>
                     {
-                        todolists.map(tl => {
+
+                     todolists.map(tl => {
                             let allTodolistTasks = tasks[tl.id];
 
                             return <Grid item key={tl.id}>
@@ -124,10 +127,15 @@ function App() {
                             </Grid>
                         })
                     }
-                </Grid>
+                </Grid>*/}
             </Container>
         </div>
     );
 }
+
+/*type TodolistsListType = {
+    todolists: Array<TodolistDomainType>
+}*/
+
 
 export default App;

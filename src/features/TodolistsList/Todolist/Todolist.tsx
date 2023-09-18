@@ -1,15 +1,15 @@
 import React, {useCallback, useEffect} from 'react'
-import {AddItemForm} from './AddItemForm'
-import {EditableSpan} from './EditableSpan'
+import {AddItemForm} from '../../../components/AddItemForm/AddItemForm'
+import {EditableSpan} from '../../../components/EditableSpan/EditableSpan'
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import {Delete} from '@mui/icons-material';
-import {Task} from './Task'
+import {Task} from './Task/Task'
 
-import {TaskStatuses, TaskType} from './api/todolists-api';
-import {fetchTodolistTC, FilterValuesType} from './state/todolists-reducer';
-import {useAppDispatch} from './state/store';
-import {fetchTasksTC} from './state/tasks-reducer';
+import {TaskStatuses, TaskType} from '../../../api/todolists-api';
+import {fetchTodolistTC, FilterValuesType} from '../todolists-reducer';
+import {useAppDispatch} from '../../../app/store';
+import {fetchTasksTC} from '../tasks-reducer';
 
 // export type TaskType = {
 //     id: string
