@@ -34,8 +34,10 @@ export type TasksStateType = {
     [key: string]: Array<TaskType>
 }
 
-
-function App() {
+type PropsType={
+    demo?:boolean
+}
+function App({demo=false,...props}:PropsType) {
 const status=useSelector<AppRootStateType, RequestStatusType>(state=>state.app.status)
     /*const todolists = useSelector<AppRootStateType, Array<TodolistDomainType>>(state => state.todolists)
     const tasks = useSelector<AppRootStateType, TasksStateType>(state => state.tasks)
@@ -104,7 +106,7 @@ const status=useSelector<AppRootStateType, RequestStatusType>(state=>state.app.s
                 {status==='loading' && <LinearProgress/>}
             </AppBar>
             <Container fixed>
-                <TodolistsList />
+                <TodolistsList demo={demo}/>
                 {/*     <Grid container style={{padding: '20px'}}>
                     <AddItemForm addItem={addTodolist}/>
                 </Grid>
