@@ -25,6 +25,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AppRootStateType, useAppDispatch} from './store';
 import {TaskStatuses, TaskType, todolistsApi, TodolistType} from '../api/todolists-api';
 import {TodolistsList} from '../features/TodolistsList/TodolistsList';
+import {LinearProgress} from '@mui/material';
+import  {ErrorSnackbar} from '../components/ErrorSnackbar/ErrorSnackbar';
+import {RequestStatusType} from './app-reducer';
 
 
 export type TasksStateType = {
@@ -33,7 +36,7 @@ export type TasksStateType = {
 
 
 function App() {
-
+const status=useSelector<AppRootStateType, RequestStatusType>(state=>state.app.status)
     /*const todolists = useSelector<AppRootStateType, Array<TodolistDomainType>>(state => state.todolists)
     const tasks = useSelector<AppRootStateType, TasksStateType>(state => state.tasks)
     const dispatch = useAppDispatch();
@@ -86,7 +89,9 @@ function App() {
 
     return (
         <div className="App">
+            <ErrorSnackbar/>
             <AppBar position="static">
+
                 <Toolbar>
                     <IconButton edge="start" color="inherit" aria-label="menu">
                         <Menu/>
@@ -96,6 +101,7 @@ function App() {
                     </Typography>
                     <Button color="inherit">Login</Button>
                 </Toolbar>
+                {status==='loading' && <LinearProgress/>}
             </AppBar>
             <Container fixed>
                 <TodolistsList />
