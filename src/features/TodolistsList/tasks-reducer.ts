@@ -6,6 +6,7 @@ import {AppRootStateType} from '../../app/store';
 import {Simulate} from 'react-dom/test-utils';
 import error = Simulate.error;
 import {setAppErrorAC, SetErrorType, setAppStatusAC, SetStatusType} from '../../app/app-reducer';
+import {handleServerAppError, handleServerNetWorkError} from '../../utils/error-utils';
 
 
 const initialState: TasksStateType = {}
@@ -120,13 +121,19 @@ export const addTasksTC = (title: string, todolistId: string) =>
                     dispatch(action);
                     dispatch(setAppStatusAC('succeeded'))
                 } else {
-                    if (res.data.messages.length) {
+                    handleServerAppError(res.data,dispatch)
+                   /* if (res.data.messages.length) {
                         dispatch(setAppErrorAC(res.data.messages[0]))
                     } else {
                         dispatch(setAppErrorAC('Some error occurred'))
                     }
-                    dispatch(setAppStatusAC('failed'))
+                    dispatch(setAppStatusAC('failed'))*/
                 }
+            })
+            .catch((error)=>{
+                handleServerNetWorkError(error,dispatch)
+              /*  dispatch(setAppErrorAC(error.message))
+                dispatch(setAppStatusAC('failed'))*/
             })
     }
 export const updateTaskTC = (taskId: string, domainModel: UpdateDomainTaskModelType, todolistId: string) =>
@@ -150,8 +157,24 @@ export const updateTaskTC = (taskId: string, domainModel: UpdateDomainTaskModelT
 
         todolistsApi.updateTask(todolistId, taskId, apiModel)
             .then((res) => {
-                const action = updateTaskAC(taskId, domainModel, todolistId);
-                dispatch(action);
+                if (res.data.resultCode===0){
+                    const action = updateTaskAC(taskId, domainModel, todolistId);
+                    dispatch(action);
+                } else{
+                    handleServerAppError(res.data,dispatch)
+                 /*   if (res.data.messages.length) {
+                        dispatch(setAppErrorAC(res.data.messages[0]))
+                    } else {
+                        dispatch(setAppErrorAC('Some error occurred'))
+                    }
+                    dispatch(setAppStatusAC('failed'))*/
+                }
+
+            })
+            .catch((error)=>{
+                handleServerNetWorkError(error,dispatch)
+                /*dispatch(setAppErrorAC(error.message))
+                dispatch(setAppStatusAC('failed'))*/
             })
     }
 
