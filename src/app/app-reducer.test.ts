@@ -7,7 +7,8 @@ beforeEach(()=>{
 
     startState={
         status: 'idle',
-        error:''
+        error:'',
+        initialized:false
     }
 })
 test('correct error message should be set',()=>{

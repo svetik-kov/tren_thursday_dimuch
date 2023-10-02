@@ -1,44 +1,43 @@
 import React, {useCallback, useEffect} from 'react'
 import './App.css';
-import {Todolist} from '../features/TodolistsList/Todolist/Todolist';
-import {AddItemForm} from '../components/AddItemForm/AddItemForm';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 import {Menu} from '@mui/icons-material';
-import {
-    addTodolistTC,
-    changeTodolistFilterAC,
-    changeTodolistTitleTC, fetchTodolistTC, FilterValuesType,
-    removeTodolistTC, TodolistDomainType
-} from '../features/TodolistsList/todolists-reducer';
-import {
-    addTasksTC,
-    removeTasksTC, updateTaskTC
-} from '../features/TodolistsList/tasks-reducer';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppRootStateType, useAppDispatch} from './store';
 import {TaskStatuses, TaskType, todolistsApi, TodolistType} from '../api/todolists-api';
 import {TodolistsList} from '../features/TodolistsList/TodolistsList';
-import {LinearProgress} from '@mui/material';
-import  {ErrorSnackbar} from '../components/ErrorSnackbar/ErrorSnackbar';
-import {RequestStatusType} from './app-reducer';
+import {CircularProgress, LinearProgress} from '@mui/material';
+import {ErrorSnackbar} from '../components/ErrorSnackbar/ErrorSnackbar';
+import {InitializedTC, RequestStatusType} from './app-reducer';
+import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import {Login} from '../features/Login/Login';
+import {logOutTC} from '../features/TodolistsList/login-reducer';
 
 
 export type TasksStateType = {
     [key: string]: Array<TaskType>
 }
 
-type PropsType={
-    demo?:boolean
+type PropsType = {
+    demo?: boolean
 }
-function App({demo=false,...props}:PropsType) {
-const status=useSelector<AppRootStateType, RequestStatusType>(state=>state.app.status)
+
+function App({demo = false, ...props}: PropsType) {
+    const status = useSelector<AppRootStateType, RequestStatusType>(state => state.app.status)
+    const isInitialized = useSelector<AppRootStateType, boolean>(state => state.app.initialized)
+    const isLoginIn = useSelector<AppRootStateType, boolean>(state => state.login.isLoggedIn)
+    const dispatch = useAppDispatch()
+    useEffect(() => {
+        dispatch(InitializedTC())
+    }, [])
+    const logOutHandler = useCallback(() => {
+        dispatch(logOutTC())
+    }, [])
     /*const todolists = useSelector<AppRootStateType, Array<TodolistDomainType>>(state => state.todolists)
     const tasks = useSelector<AppRootStateType, TasksStateType>(state => state.tasks)
     const dispatch = useAppDispatch();
@@ -88,26 +87,37 @@ const status=useSelector<AppRootStateType, RequestStatusType>(state=>state.app.s
         /!*const action = addTodolistAC(title);
         dispatch(action)*!/;
     }, [dispatch]);*/
+    if (!isInitialized) {
+        return <div style={{position: 'absolute', top: '30%', textAlign: 'center', width: '100%'}}>
+            <CircularProgress color="secondary"/>
+        </div>
+    }
+
+
 
     return (
-        <div className="App">
-            <ErrorSnackbar/>
-            <AppBar position="static">
+        <BrowserRouter>
+            <div className="App">
+                <ErrorSnackbar/>
+                <AppBar position="static">
 
-                <Toolbar>
-                    <IconButton edge="start" color="inherit" aria-label="menu">
-                        <Menu/>
-                    </IconButton>
-                    <Typography variant="h6">
-                        News
-                    </Typography>
-                    <Button color="inherit">Login</Button>
-                </Toolbar>
-                {status==='loading' && <LinearProgress/>}
-            </AppBar>
-            <Container fixed>
-                <TodolistsList demo={demo}/>
-                {/*     <Grid container style={{padding: '20px'}}>
+                    <Toolbar>
+                        <IconButton edge="start" color="inherit" aria-label="menu">
+                            <Menu/>
+                        </IconButton>
+                        <Typography variant="h6">
+                            News
+                        </Typography>
+                        {isLoginIn && <Button color="inherit" onClick={logOutHandler}>Log out</Button>}
+                    </Toolbar>
+                    {status === 'loading' && <LinearProgress/>}
+                </AppBar>
+                <Container fixed>
+                    <Routes>
+                        <Route path={'/'} element={<TodolistsList demo={demo}/>}/>
+                        <Route path={'/login'} element={<Login/>}/>
+                    </Routes>
+                    {/*     <Grid container style={{padding: '20px'}}>
                     <AddItemForm addItem={addTodolist}/>
                 </Grid>
                 <Grid container spacing={3}>
@@ -136,8 +146,9 @@ const status=useSelector<AppRootStateType, RequestStatusType>(state=>state.app.s
                         })
                     }
                 </Grid>*/}
-            </Container>
-        </div>
+                </Container>
+            </div>
+        </BrowserRouter>
     );
 }
 
