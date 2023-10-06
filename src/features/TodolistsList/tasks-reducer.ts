@@ -7,6 +7,7 @@ import {Simulate} from 'react-dom/test-utils';
 import error = Simulate.error;
 import {setAppErrorAC, SetErrorType, setAppStatusAC, SetStatusType} from '../../app/app-reducer';
 import {handleServerAppError, handleServerNetWorkError} from '../../utils/error-utils';
+import axios, {AxiosError} from 'axios';
 
 
 const initialState: TasksStateType = {}
@@ -102,16 +103,63 @@ export const fetchTasksTC = (todolistId: string) => (dispatch: Dispatch<ActionsT
             dispatch(setAppStatusAC('succeeded'))
         })
 }
-export const removeTasksTC = (taskId: string, todolistId: string) =>
+//promise
+/*export const removeTasksTC = (taskId: string, todolistId: string) =>
     (dispatch: Dispatch<ActionsType>) => {
         todolistsApi.deleteTask(todolistId, taskId)
             .then((res) => {
                 const action = removeTaskAC(taskId, todolistId);
                 dispatch(action);
             })
-    }
-export const addTasksTC = (title: string, todolistId: string) =>
+    }*/
+//async await типизация error
+export const removeTasksTC = (taskId: string, todolistId: string) => async (dispatch: Dispatch<ActionsType>) => {
+    dispatch(setAppStatusAC('loading'))
+    try {
+        const res = await todolistsApi.deleteTask(todolistId, taskId)
+        if (res.data.resultCode === 0) {
+            const action = removeTaskAC(taskId, todolistId)
+            dispatch(action)
+            dispatch(setAppStatusAC('succeeded'))
+        } else {
+            handleServerAppError(res.data, dispatch)
+        }
 
+    } catch (e) {
+        if (axios.isAxiosError<ErrorType>(e)) {
+            const errorMessage = e.response ? e.response.data.error : e.message
+            handleServerNetWorkError(errorMessage, dispatch)
+        } else {
+            handleServerNetWorkError((e as Error).message, dispatch)
+        }
+    }
+    todolistsApi.deleteTask(todolistId, taskId)
+        .then((res) => {
+            const action = removeTaskAC(taskId, todolistId);
+            dispatch(action);
+        })
+}
+
+// export const addTasksTC = (title: string, todolistId: string) =>
+//     (dispatch: Dispatch<ActionsType>) => {
+//         dispatch(setAppStatusAC('loading'))
+//         todolistsApi.createTask(todolistId, title)
+//             .then((res) => {
+//                 if (res.data.resultCode === 0) {
+//                     const action = addTaskAC(res.data.data.item);
+//                     dispatch(action);
+//                     dispatch(setAppStatusAC('succeeded'))
+//                 } else {
+//                     handleServerAppError(res.data,dispatch)
+//                 }
+//             })
+//             .catch((error)=>{
+//                 handleServerNetWorkError(error,dispatch)
+//             })
+//     }
+
+//типизация error
+export const addTasksTC = (title: string, todolistId: string) =>
     (dispatch: Dispatch<ActionsType>) => {
         dispatch(setAppStatusAC('loading'))
         todolistsApi.createTask(todolistId, title)
@@ -121,19 +169,12 @@ export const addTasksTC = (title: string, todolistId: string) =>
                     dispatch(action);
                     dispatch(setAppStatusAC('succeeded'))
                 } else {
-                    handleServerAppError(res.data,dispatch)
-                   /* if (res.data.messages.length) {
-                        dispatch(setAppErrorAC(res.data.messages[0]))
-                    } else {
-                        dispatch(setAppErrorAC('Some error occurred'))
-                    }
-                    dispatch(setAppStatusAC('failed'))*/
+                    handleServerAppError(res.data, dispatch)
                 }
             })
-            .catch((error)=>{
-                handleServerNetWorkError(error,dispatch)
-              /*  dispatch(setAppErrorAC(error.message))
-                dispatch(setAppStatusAC('failed'))*/
+            .catch((error: AxiosError<ErrorType>) => {
+                const errorMessage = error.response ? error.response.data.error : error.message
+                handleServerNetWorkError(errorMessage, dispatch)
             })
     }
 export const updateTaskTC = (taskId: string, domainModel: UpdateDomainTaskModelType, todolistId: string) =>
@@ -157,22 +198,22 @@ export const updateTaskTC = (taskId: string, domainModel: UpdateDomainTaskModelT
 
         todolistsApi.updateTask(todolistId, taskId, apiModel)
             .then((res) => {
-                if (res.data.resultCode===0){
+                if (res.data.resultCode === 0) {
                     const action = updateTaskAC(taskId, domainModel, todolistId);
                     dispatch(action);
-                } else{
-                    handleServerAppError(res.data,dispatch)
-                 /*   if (res.data.messages.length) {
-                        dispatch(setAppErrorAC(res.data.messages[0]))
-                    } else {
-                        dispatch(setAppErrorAC('Some error occurred'))
-                    }
-                    dispatch(setAppStatusAC('failed'))*/
+                } else {
+                    handleServerAppError(res.data, dispatch)
+                    /*   if (res.data.messages.length) {
+                           dispatch(setAppErrorAC(res.data.messages[0]))
+                       } else {
+                           dispatch(setAppErrorAC('Some error occurred'))
+                       }
+                       dispatch(setAppStatusAC('failed'))*/
                 }
 
             })
-            .catch((error)=>{
-                handleServerNetWorkError(error,dispatch)
+            .catch((error) => {
+                handleServerNetWorkError(error, dispatch)
                 /*dispatch(setAppErrorAC(error.message))
                 dispatch(setAppStatusAC('failed'))*/
             })
@@ -197,4 +238,10 @@ type UpdateDomainTaskModelType = {
     priority?: TaskPriorities
     startDate?: string
     deadline?: string
+}
+
+type ErrorType = {
+    statusCode: number,
+    messages: [{ message: string, field: string }]
+    error: string
 }
