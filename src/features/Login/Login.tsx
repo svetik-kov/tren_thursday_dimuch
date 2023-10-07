@@ -13,7 +13,7 @@ import {loginTC} from '../TodolistsList/login-reducer';
 import {useSelector} from 'react-redux';
 import {Navigate} from 'react-router-dom';
 
-const res=Object.values(formik.errors)
+
 export const Login = () => {
     const isLoginIn = useSelector<AppRootStateType, boolean>(state => state.login.isLoggedIn)
     const dispatch = useAppDispatch()
@@ -43,6 +43,7 @@ export const Login = () => {
     if (isLoginIn) {
         return <Navigate to={'/'}/>
     }
+    const res=Object.values(formik.errors)
     return <Grid container justifyContent={'center'}>
         <Grid item justifyContent={'center'}>
             <form>
